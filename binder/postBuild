@@ -1,0 +1,187 @@
+#!/bin/bash
+
+###############################################################
+#          jupyter/jupyterlab extensions/kernels              #
+###############################################################
+
+# jupyter labextension install jupyter-offlinenotebook
+# jupyter labextension install jupyterlab-server-proxy
+# jupyter labextension install @jupyterlab/server-proxy
+jupyter lab build
+
+###############################################################
+#             moving to a local installation folder           #
+###############################################################
+mkdir ~/resources/
+mkdir ~/resources/local
+
+cd    ~/resources/local
+
+###############################################################
+#             hadoop-related commands                         #
+###############################################################
+
+export HADOOP_VERSION=2.9.2
+echo "export HADOOP_VERSION=${HADOOP_VERSION}" >> ~/.bashrc
+echo "export HADOOP_VERSION=${HADOOP_VERSION}" >> ~/.profile
+
+export HADOOP_HOME=$(pwd)/hadoop-${HADOOP_VERSION}
+echo "export HADOOP_HOME=${HADOOP_HOME}"       >> ~/.bashrc
+echo "export HADOOP_HOME=${HADOOP_HOME}"       >> ~/.profile
+
+wget https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz -q   && \
+tar -xvf hadoop-${HADOOP_VERSION}.tar.gz >> /dev/null                                                             && \
+rm       hadoop-${HADOOP_VERSION}.tar.gz
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 " >> ~/.bashrc
+echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 " >> ~/.profile
+echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 " >> ${HADOOP_HOME}/etc/hadoop/hadoop-env.sh
+
+# adding bin and sbin to $path
+echo "export PATH=\$PATH:\$HADOOP_HOME/bin"  >> ~/.bashrc
+echo "export PATH=\$PATH:\$HADOOP_HOME/bin"  >> ~/.profile
+echo "export PATH=\$PATH:\$HADOOP_HOME/sbin" >> ~/.bashrc
+echo "export PATH=\$PATH:\$HADOOP_HOME/sbin" >> ~/.profile
+
+# creating ssh-related folders
+mkdir ~/.ssh/etc/ssh -p
+
+# setup passphraseless ssh (forcing the adding to know hosts)
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa  &&   cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys
+
+# generating keys for sshd server
+ssh-keygen -A -f ~/.ssh
+chmod 600 ~/.ssh/etc/ssh/* -R
+
+# hadoop 3.*.*
+export PDSH_RCMD_TYPE=ssh
+echo "export PDSH_RCMD_TYPE=ssh" >> ~/.bashrc
+echo "export PDSH_RCMD_TYPE=ssh" >> ~/.profile
+
+# Adding ssh options to Hadoop via envvar
+# connecting in a diferent port (-p 8822)
+# avoiding host key checking (-o StrictHostKeyChecking=no)
+export HADOOP_SSH_OPTS="-o StrictHostKeyChecking=no -p 8822"
+echo "export HADOOP_SSH_OPTS=\"-o StrictHostKeyChecking=no -p 8822\"" >> ~/.bashrc
+echo "export HADOOP_SSH_OPTS=\"-o StrictHostKeyChecking=no -p 8822\"" >> ~/.profile
+
+
+###############################################################
+#               hive-related commands                         #
+###############################################################
+
+export HIVE_VERSION=2.3.9
+echo "export HIVE_VERSION=${HIVE_VERSION}" >> ~/.bashrc
+echo "export HIVE_VERSION=${HIVE_VERSION}" >> ~/.profile
+
+export HIVE_HOME=$(pwd)/hive-${HIVE_VERSION}
+echo "export HIVE_HOME=${HIVE_HOME}"       >> ~/.bashrc
+echo "export HIVE_HOME=${HIVE_HOME}"       >> ~/.profile
+
+wget https://downloads.apache.org/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz -q
+tar -xvf apache-hive-${HIVE_VERSION}-bin.tar.gz >> /dev/null
+rm       apache-hive-${HIVE_VERSION}-bin.tar.gz
+mv       apache-hive-${HIVE_VERSION}-bin        hive-${HIVE_VERSION}
+
+# adding bin and sbin to $path
+echo "export PATH=\$PATH:\$HIVE_HOME/bin"  >> ~/.bashrc
+echo "export PATH=\$PATH:\$HIVE_HOME/bin"  >> ~/.profile
+
+###############################################################
+#             mysql minimal installation commands             #
+###############################################################
+#
+#export MYSQL_VERSION=8.0.17
+#echo "export MYSQL_VERSION=${MYSQL_VERSION}" >> ~/.bashrc
+#echo "export MYSQL_VERSION=${MYSQL_VERSION}" >> ~/.profile
+#
+#export MYSQL_HOME=$(pwd)/mysql-${MYSQL_VERSION}
+#echo "export MYSQL_HOME=${MYSQL_HOME}"       >> ~/.bashrc
+#echo "export MYSQL_HOME=${MYSQL_HOME}"       >> ~/.profile
+#
+#
+#wget https://cdn.mysql.com/archives/mysql-8.0/mysql-${MYSQL_VERSION}-linux-x86_64-minimal.tar.xz -q
+#tar -xf mysql-${MYSQL_VERSION}-linux-x86_64-minimal.tar.xz >> /dev/null
+#rm      mysql-${MYSQL_VERSION}-linux-x86_64-minimal.tar.xz
+#mv      mysql-${MYSQL_VERSION}-linux-x86_64-minimal        mysql-${MYSQL_VERSION}
+#
+## adding bin/ to $path
+#echo "export PATH=\$PATH:\$MYSQL_HOME/bin"   >> ~/.bashrc
+#echo "export PATH=\$PATH:\$MYSQL_HOME/bin"   >> ~/.profile
+
+
+###############################################################
+#                 kafka-related commands                      #
+###############################################################
+#export KAFKA_VERSION=2.7.0
+#echo "export KAFKA_VERSION=${KAFKA_VERSION}" >> ~/.bashrc
+#echo "export KAFKA_VERSION=${KAFKA_VERSION}" >> ~/.profile
+#
+#export KAFKA_HOME=$(pwd)/kafka-${KAFKA_VERSION}
+#echo "export KAFKA_HOME=${KAFKA_HOME}" >> ~/.bashrc
+#echo "export KAFKA_HOME=${KAFKA_HOME}" >> ~/.profile
+#
+#
+#wget https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz -q 	    && \
+##wget https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka-${KAFKA_VERSION}-src.tgz -q 	    && \
+#tar -xvzf kafka_2.12-${KAFKA_VERSION}.tgz > /dev/null 										 		&& \
+#rm       kafka_2.12-${KAFKA_VERSION}.tgz															&& \
+#mv 		 kafka_2.12-${KAFKA_VERSION}	kafka-${KAFKA_VERSION}
+#
+## adding bin/ to $path
+#echo "export PATH=\$PATH:\$KAFKA_HOME/bin"   >> ~/.bashrc
+#echo "export PATH=\$PATH:\$KAFKA_HOME/bin"   >> ~/.profile
+
+###############################################################
+#                 spark-related commands                      #
+###############################################################
+export SPARK_VERSION=3.2.1
+echo "export SPARK_VERSION=${SPARK_VERSION}" >> ~/.bashrc
+echo "export SPARK_VERSION=${SPARK_VERSION}" >> ~/.profile
+
+export SPARK_HOME=$(pwd)/spark-${SPARK_VERSION}
+echo "export SPARK_HOME=${SPARK_HOME}" >> ~/.bashrc
+echo "export SPARK_HOME=${SPARK_HOME}" >> ~/.profile
+
+wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz               && \
+tar -xvzf spark-${SPARK_VERSION}-bin-hadoop2.7.tgz > /dev/null 										 		              && \
+rm       spark-${SPARK_VERSION}-bin-hadoop2.7.tgz															              && \
+mv 		 spark-${SPARK_VERSION}-bin-hadoop2.7	spark-${SPARK_VERSION}
+
+# adding bin/ to $path
+echo "export PATH=\$PATH:\$SPARK_HOME/bin"   >> ~/.bashrc
+echo "export PATH=\$PATH:\$SPARK_HOME/bin"   >> ~/.profile
+
+################################################################
+##                 minio-related commands                      #
+################################################################
+#wget https://dl.min.io/server/minio/release/linux-amd64/minio
+#wget https://dl.min.io/client/mc/release/linux-amd64/mc
+#
+## adding mc to $path
+#echo "export PATH=\$PATH:\$(pwd)/resources/local/"   >> ~/.bashrc
+#echo "export PATH=\$PATH:\$(pwd)/resources/local/"   >> ~/.profile
+
+
+
+###############################################################
+#             livy installation                               #
+###############################################################
+
+
+export LIVY_VERSION=0.7.0
+echo "export LIVY_VERSION=${LIVY_VERSION}" >> ~/.bashrc
+echo "export LIVY_VERSION=${LIVY_VERSION}" >> ~/.profile
+
+export LIVY_HOME=$(pwd)/livy-${LIVY_VERSION}
+echo "export LIVY_HOME=${LIVY_HOME}" >> ~/.bashrc
+echo "export LIVY_HOME=${LIVY_HOME}" >> ~/.profile
+
+wget https://downloads.apache.org/incubator/livy/0.7.0-incubating/apache-livy-0.7.0-incubating-bin.zip -O apache-livy-0.7.0-incubating-bin.zip 
+unzip -o apache-livy-0.7.0-incubating-bin.zip && rm apache-livy-0.7.0-incubating-bin.zip 
+mv apache-livy-0.7.0-incubating-bin livy-${LIVY_VERSION} && cd livy-${LIVY_VERSION} && mkdir logs -p && cd ..
+
+# adding bin/ to $path
+echo "export PATH=\$PATH:\$LIVY_HOME/bin"   >> ~/.bashrc
+echo "export PATH=\$PATH:\$LIVY_HOME/bin"   >> ~/.profile

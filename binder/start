@@ -1,0 +1,34 @@
+#!/bin/bash
+
+chmod +x ~/binder/start.hadoop
+chmod +x ~/binder/start.hive
+chmod +x ~/binder/start.livy
+#chmod +x ~/binder/start.mysql
+#chmod +x ~/binder/start.zookeeper
+#chmod +x ~/binder/start.kafka
+#chmod +x ~/binder/start.minio
+#chmod +x ~/resources/local/minio
+#chmod +x ~/resources/local/mc
+
+# starting mysql in parallel
+#~/binder/start.mysql   &
+
+~/binder/start.hadoop  &&\
+sleep 3                &&\
+~/binder/start.hive    &&\
+sleep 3                &&\
+~/binder/start.livy    &&\
+touch ready            &
+#sleep 3                &&\
+#~/binder/start.zookeeper    && \
+#sleep 3                		&& \
+#~/binder/start.kafka   		&& \
+#sleep 3                		&& \
+#~/binder/start.minio         	&&\
+
+
+
+
+# DO NOT REMOVE(!) 
+# Here is why: https://mybinder.readthedocs.io/en/latest/config_files.html#start-run-code-before-the-user-sessions-starts
+# exec "$@"

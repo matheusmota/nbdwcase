@@ -1,0 +1,8 @@
+setup.py
+datalakecase/__init__.py
+datalakecase/jobs.py
+datalakecase/utils.py
+datalakecase.egg-info/PKG-INFO
+datalakecase.egg-info/SOURCES.txt
+datalakecase.egg-info/dependency_links.txt
+datalakecase.egg-info/top_level.txt

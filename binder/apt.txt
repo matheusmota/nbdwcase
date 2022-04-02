@@ -1,0 +1,11 @@
+htop
+net-tools
+openjdk-8-jdk
+ssh
+vim
+
+# mysql/mariadb packages
+libaio1
+libaio-dev
+numactl
+libncurses5

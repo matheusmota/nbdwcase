@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source ~/.profile
+
+
+cp ~/resources/configs/spark/${SPARK_VERSION}/spark-env.sh ${SPARK_HOME}/conf/ 
+chmod +x  ${SPARK_HOME}/conf/spark-env.sh
+
+
+$SPARK_HOME/sbin/start-master.sh 
+$SPARK_HOME/sbin/start-slave.sh "spark://localhost:7077" 
+$SPARK_HOME/sbin/start-slave.sh "spark://localhost:7077" 
+$SPARK_HOME/sbin/start-slave.sh "spark://localhost:7077" 

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd ~/resources/local
+mkdir ~/resources/local/logs
+
+nohup minio server --address :9001 ~/resources/local/data &> ~/resources/local/logs/minio.log &
